@@ -110,7 +110,7 @@ ssl_key: /path/key.pem
 # This option could be useful for load-balancing with multiple sproxy instances,
 # when all instances must understand cookies created by each other.
 # This should not be very large, a few random bytes are fine.
-# 
+#
 # key: !include /run/keys/sproxy.secret
 
 
