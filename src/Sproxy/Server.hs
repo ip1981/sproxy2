@@ -13,7 +13,7 @@ import Data.Word (Word16)
 import Data.Yaml.Include (decodeFileEither)
 import Network.HTTP.Client
        (Manager, ManagerSettings(..), defaultManagerSettings, newManager,
-        socketConnection)
+        responseTimeoutMicro, socketConnection)
 import Network.HTTP.Client.Internal (Connection)
 import Network.Socket
        (Family(AF_INET, AF_UNIX), SockAddr(SockAddrInet, SockAddrUnix),
@@ -152,6 +152,7 @@ newBackendManager be = do
     defaultManagerSettings
     { managerRawConnection = return $ \_ _ _ -> openConn
     , managerConnCount = beConnCount be
+    , managerResponseTimeout = responseTimeoutMicro (1000000 * beTimeout be)
     }
 
 newServer :: ConfigFile -> IO (Settings -> Socket -> Application -> IO ())

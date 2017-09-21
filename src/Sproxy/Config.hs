@@ -65,6 +65,7 @@ data BackendConf = BackendConf
   , beCookieDomain :: Maybe String
   , beCookieMaxAge :: Int64
   , beConnCount :: Int
+  , beTimeout :: Int
   } deriving (Show)
 
 instance FromJSON BackendConf where
@@ -75,7 +76,8 @@ instance FromJSON BackendConf where
     m .:? "cookie_name" .!= "sproxy" <*>
     m .:? "cookie_domain" <*>
     m .:? "cookie_max_age" .!= (7 * 24 * 60 * 60) <*>
-    m .:? "conn_count" .!= 32
+    m .:? "conn_count" .!= 32 <*>
+    m .:? "timeout" .!= 30
   parseJSON _ = empty
 
 data OAuth2Conf = OAuth2Conf

@@ -164,6 +164,8 @@ ssl_key: /path/key.pem
 #   cookie_name    - sproxy cookie name. Optional. Default is "sproxy".
 #   cookie_domain  - sproxy cookie domain. Optional. Default is the request host name as per RFC2109.
 #   cookie_max_age - sproxy cookie shelflife in seconds. Optional. Default is 604800 (7 days).
+#
+#   timeout        - response timeout in seconds. Optional. Default is 30.
 #   conn_count     - number of connections to keep alive. Optional. Default is 32.
 #                    This is specific to Haskell HTTP Client library, and is per host name,
 #                    not per backend. HTTP Client's default is 10.
