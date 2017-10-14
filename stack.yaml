@@ -1,6 +1,9 @@
-resolver: lts-9.0
-system-ghc: true
+resolver: lts-9.6
+
 install-ghc: false
+skip-ghc-check: true
+system-ghc: true
+
 packages:
 
 - '.'
