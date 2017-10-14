@@ -13,7 +13,7 @@ import Prelude hiding (error)
 import Control.Applicative (empty)
 import Control.Concurrent (forkIO)
 import Control.Concurrent.Chan (Chan, newChan, readChan, writeChan)
-import Control.Monad (forever, when)
+import Control.Monad (forever, void, when)
 import Data.Aeson (FromJSON, ToJSON)
 import qualified Data.Aeson as JSON
 import Data.Char (toLower)
@@ -28,8 +28,7 @@ start None = return ()
 start lvl = do
   writeIORef logLevel lvl
   ch <- readIORef chanRef
-  _ <- forkIO . forever $ readChan ch >>= hPrint stderr
-  return ()
+  void . forkIO . forever $ readChan ch >>= hPrint stderr
 
 info :: String -> IO ()
 info = send . Message Info
