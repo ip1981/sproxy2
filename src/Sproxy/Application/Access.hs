@@ -1,20 +1,19 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Sproxy.Application.Access
   ( Inquiry
   , Question(..)
   ) where
 
-import Data.Aeson (FromJSON)
+import Data.Aeson.TH (defaultOptions, deriveFromJSON)
 import Data.HashMap.Strict (HashMap)
 import Data.Text (Text)
-import GHC.Generics (Generic)
 
 data Question = Question
   { path :: Text
   , method :: Text
-  } deriving (Generic, Show)
+  } deriving (Show)
 
-instance FromJSON Question
+$(deriveFromJSON defaultOptions ''Question)
 
 type Inquiry = HashMap Text Question
