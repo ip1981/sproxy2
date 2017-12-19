@@ -55,7 +55,6 @@ executable sproxy2
       , bytestring
       , cereal
       , conduit
-      , containers
       , cookie >= 0.4.2
       , docopt
       , entropy

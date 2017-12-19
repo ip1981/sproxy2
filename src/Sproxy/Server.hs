@@ -6,7 +6,7 @@ import Control.Concurrent (forkIO)
 import Control.Exception (bracketOnError)
 import Control.Monad (void, when)
 import Data.ByteString.Char8 (pack)
-import Data.HashMap.Strict as HM (fromList, lookup, toList)
+import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Word (Word16)

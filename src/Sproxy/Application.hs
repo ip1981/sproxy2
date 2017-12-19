@@ -13,14 +13,12 @@ import Control.Exception
        (Exception, Handler(..), SomeException, catches, displayException)
 import qualified Data.Aeson as JSON
 import Data.ByteString (ByteString)
-import Data.ByteString as BS (break, intercalate)
+import qualified Data.ByteString as BS
 import Data.ByteString.Char8 (pack, unpack)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Conduit (Flush(Chunk), mapOutput)
-import Data.HashMap.Strict as HM (HashMap, foldrWithKey, lookup)
+import qualified Data.HashMap.Strict as HM
 import Data.List (find, partition)
-import Data.Map as Map
-       (delete, fromListWith, insert, insertWith, toList)
 import Data.Maybe (fromJust, fromMaybe)
 import Data.Monoid ((<>))
 import Data.Text (Text)
@@ -83,7 +81,7 @@ redirect p req resp =
 sproxy ::
      ByteString
   -> Database
-  -> HashMap Text OAuth2Client
+  -> HM.HashMap Text OAuth2Client
   -> [(Pattern, BackendConf, BE.Manager)]
   -> W.Application
 sproxy key db oa2 backends =
@@ -230,20 +228,20 @@ authorize db (authCookie, otherCookies) req = do
       return . Just $
         req
         { W.requestHeaders =
-            toList $
-            insert "From" emailUtf8 $
-            insert "X-Groups" (BS.intercalate "," $ encodeUtf8 <$> grps) $
-            insert "X-Given-Name" givenUtf8 $
-            insert "X-Family-Name" familyUtf8 $
-            insert "X-Forwarded-Proto" "https" $
-            insertWith (flip combine) "X-Forwarded-For" ip $
+            HM.toList $
+            HM.insert "From" emailUtf8 $
+            HM.insert "X-Groups" (BS.intercalate "," $ encodeUtf8 <$> grps) $
+            HM.insert "X-Given-Name" givenUtf8 $
+            HM.insert "X-Family-Name" familyUtf8 $
+            HM.insert "X-Forwarded-Proto" "https" $
+            HM.insertWith (flip combine) "X-Forwarded-For" ip $
             setCookies otherCookies $
-            fromListWith combine $ W.requestHeaders req
+            HM.fromListWith combine $ W.requestHeaders req
         }
   where
     combine a b = a <> "," <> b
-    setCookies [] = delete hCookie
-    setCookies cs = insert hCookie (toByteString . renderCookies $ cs)
+    setCookies [] = HM.delete hCookie
+    setCookies cs = HM.insert hCookie (toByteString . renderCookies $ cs)
 
 checkAccess :: Database -> AuthCookie -> W.Application
 checkAccess db authCookie req resp = do
@@ -321,7 +319,7 @@ modifyResponseHeaders = filter (\(n, _) -> n `notElem` ban)
       ]
 
 authenticationRequired ::
-     ByteString -> HashMap Text OAuth2Client -> W.Application
+     ByteString -> HM.HashMap Text OAuth2Client -> W.Application
 authenticationRequired key oa2 req resp = do
   Log.info $ "511 Unauthenticated: " ++ showReq req
   resp $
@@ -342,7 +340,7 @@ authenticationRequired key oa2 req resp = do
       let u = oauth2AuthorizeURL oa2c state (redirectURL req provider)
           d = pack $ oauth2Description oa2c
       in [qc|{html}<p><a href="{u}">Authenticate with {d}</a></p>|]
-    authHtml = foldrWithKey authLink "" oa2
+    authHtml = HM.foldrWithKey authLink "" oa2
     page =
       fromStrict
         [qc|
