@@ -8,9 +8,8 @@ module Sproxy.Server.DB.DataFile
   ) where
 
 import Control.Applicative (empty)
-import Data.Aeson (FromJSON, parseJSON)
+import Data.Aeson (FromJSON, Value(Object), (.:), parseJSON)
 import Data.Text (Text)
-import Data.Yaml (Value(Object), (.:))
 
 data DataFile = DataFile
   { groupMember :: [GroupMember]
