@@ -105,11 +105,10 @@ ssl_key: /path/key.pem
 
 
 # Arbitrary string used to sign sproxy cookie and other things (secret!).
-# Optional. If not specified, a random key is generated on startup, and
-# as a consequence, restaring sproxy will invalidate existing user sessions.
+# Optional. If not specified, a random key of length 64 is generated on startup,
+# and as a consequence, restaring sproxy will invalidate existing user sessions.
 # This option could be useful for load-balancing with multiple sproxy instances,
 # when all instances must understand cookies created by each other.
-# This should not be very large, a few random bytes are fine.
 #
 # key: !include /run/keys/sproxy.secret
 

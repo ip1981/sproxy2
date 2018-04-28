@@ -75,7 +75,7 @@ server configFile = do
   db <- DB.start (cfHome cf) ds
   key <-
     maybe
-      (Log.info "using new random key" >> getEntropy 32)
+      (Log.info "using new random key" >> getEntropy 64)
       (return . pack)
       (cfKey cf)
   let settings =
