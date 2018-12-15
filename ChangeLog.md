@@ -1,4 +1,10 @@
-For differences with the original Sproxy scroll down.
+1.97.0
+======
+
+  * Added new option `timeout` to configure backend response timeout.
+
+  * Changed default random key length to 64 bytes (from 32).
+
 
 1.96.0
 ======

@@ -1,5 +1,5 @@
 name: sproxy2
-version: 1.96.0
+version: 1.97.0
 synopsis: Secure HTTP proxy for authenticating users via OAuth2
 description:
   Sproxy is secure by default. No requests makes it to the backend
@@ -12,10 +12,10 @@ author: Igor Pashev <pashev.igor@gmail.com>
 maintainer: Igor Pashev <pashev.igor@gmail.com>
 copyright:
   2016-2017, Zalora South East Asia Pte. Ltd;
-  2017, Igor Pashev <pashev.igor@gmail.com>
+  2017-2018, Igor Pashev <pashev.igor@gmail.com>
 category: Databases, Web
 build-type: Simple
-cabal-version: >= 1.20
+cabal-version: 1.20
 extra-source-files:
   ChangeLog.md
   README.md
