@@ -1,3 +1,9 @@
+1.97.1
+======
+
+  * Update for newer network library (>= 3.0.0.0) where `inet_addr` has been removed.
+
+
 1.97.0
 ======
 
