@@ -26,8 +26,11 @@ import Text.InterpolatedString.Perl6 (q, qc)
 import qualified Sproxy.Application.Access as A
 import qualified Sproxy.Logging as Log
 import Sproxy.Server.DB.DataFile
-       (DataFile(..), GroupMember(..), GroupPrivilege(..),
-        PrivilegeRule(..))
+  ( DataFile(..)
+  , GroupMember(..)
+  , GroupPrivilege(..)
+  , PrivilegeRule(..)
+  )
 
 type Database = Pool SQLite.Connection
 

@@ -11,19 +11,44 @@ import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Yaml.Include (decodeFileEither)
 import Network.HTTP.Client
-       (Manager, ManagerSettings(..), defaultManagerSettings, newManager,
-        responseTimeoutMicro, socketConnection)
+  ( Manager
+  , ManagerSettings(..)
+  , defaultManagerSettings
+  , newManager
+  , responseTimeoutMicro
+  , socketConnection
+  )
 import Network.HTTP.Client.Internal (Connection)
 import Network.Socket
-       (AddrInfoFlag(AI_NUMERICSERV), Family(AF_INET, AF_UNIX),
-       SockAddr(SockAddrInet, SockAddrUnix), Socket, SocketOption(ReuseAddr),
-       SocketType(Stream), addrAddress, addrFamily, addrFlags, addrProtocol,
-       addrSocketType, bind, close, connect, defaultHints, getAddrInfo,
-       listen, maxListenQueue, setSocketOption, socket)
+  ( AddrInfoFlag(AI_NUMERICSERV)
+  , Family(AF_INET, AF_UNIX)
+  , SockAddr(SockAddrInet, SockAddrUnix)
+  , Socket
+  , SocketOption(ReuseAddr)
+  , SocketType(Stream)
+  , addrAddress
+  , addrFamily
+  , addrFlags
+  , addrProtocol
+  , addrSocketType
+  , bind
+  , close
+  , connect
+  , defaultHints
+  , getAddrInfo
+  , listen
+  , maxListenQueue
+  , setSocketOption
+  , socket
+  )
 import Network.Wai (Application)
 import Network.Wai.Handler.Warp
-       (Settings, defaultSettings, runSettingsSocket, setHTTP2Disabled,
-        setOnException)
+  ( Settings
+  , defaultSettings
+  , runSettingsSocket
+  , setHTTP2Disabled
+  , setOnException
+  )
 import Network.Wai.Handler.WarpTLS (runTLSSocket, tlsSettingsChain)
 import System.Entropy (getEntropy)
 import System.Environment (setEnv)
@@ -31,14 +56,20 @@ import System.Exit (exitFailure)
 import System.FilePath.Glob (compile)
 import System.IO (hPutStrLn, stderr)
 import System.Posix.User
-       (GroupEntry(..), UserEntry(..), getAllGroupEntries, getRealUserID,
-        getUserEntryForName, setGroupID, setGroups, setUserID)
+  ( GroupEntry(..)
+  , UserEntry(..)
+  , getAllGroupEntries
+  , getRealUserID
+  , getUserEntryForName
+  , setGroupID
+  , setGroups
+  , setUserID
+  )
 
 import Sproxy.Application (redirect, sproxy)
 import qualified Sproxy.Application.OAuth2 as OAuth2
 import Sproxy.Application.OAuth2.Common (OAuth2Client)
-import Sproxy.Config
-       (BackendConf(..), ConfigFile(..), OAuth2Conf(..))
+import Sproxy.Config (BackendConf(..), ConfigFile(..), OAuth2Conf(..))
 import qualified Sproxy.Logging as Log
 import qualified Sproxy.Server.DB as DB
 
@@ -151,10 +182,10 @@ newBackendManager be = do
         exitFailure
   newManager
     defaultManagerSettings
-    { managerRawConnection = return $ \_ _ _ -> openConn
-    , managerConnCount = beConnCount be
-    , managerResponseTimeout = responseTimeoutMicro (1000000 * beTimeout be)
-    }
+      { managerRawConnection = return $ \_ _ _ -> openConn
+      , managerConnCount = beConnCount be
+      , managerResponseTimeout = responseTimeoutMicro (1000000 * beTimeout be)
+      }
 
 newServer :: ConfigFile -> IO (Settings -> Socket -> Application -> IO ())
 newServer cf

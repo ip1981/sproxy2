@@ -42,9 +42,9 @@ instance DS.Serialize AuthCookie where
     (e, n, f, x) <- DS.get
     return
       AuthCookie
-      { acUser = AuthUser {auEmail = e, auGivenName = n, auFamilyName = f}
-      , acExpiry = CTime x
-      }
+        { acUser = AuthUser {auEmail = e, auGivenName = n, auFamilyName = f}
+        , acExpiry = CTime x
+        }
 
 cookieDecode :: ByteString -> ByteString -> Either String AuthCookie
 cookieDecode key d = State.decode key d >>= DS.decode
@@ -67,10 +67,10 @@ getFamilyNameUtf8 = auFamilyName
 newUser :: Text -> AuthUser
 newUser email =
   AuthUser
-  { auEmail = encodeUtf8 . toLower . strip $ email
-  , auGivenName = ""
-  , auFamilyName = ""
-  }
+    { auEmail = encodeUtf8 . toLower . strip $ email
+    , auGivenName = ""
+    , auFamilyName = ""
+    }
 
 setGivenName :: Text -> AuthUser -> AuthUser
 setGivenName given au = au {auGivenName = encodeUtf8 . strip $ given}

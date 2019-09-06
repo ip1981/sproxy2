@@ -10,7 +10,12 @@ module Sproxy.Application
 import Blaze.ByteString.Builder (toByteString)
 import Blaze.ByteString.Builder.ByteString (fromByteString)
 import Control.Exception
-       (Exception, Handler(..), SomeException, catches, displayException)
+  ( Exception
+  , Handler(..)
+  , SomeException
+  , catches
+  , displayException
+  )
 import qualified Data.Aeson as JSON
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
@@ -29,18 +34,36 @@ import Data.Word8 (_colon)
 import Foreign.C.Types (CTime(..))
 import qualified Network.HTTP.Client as BE
 import Network.HTTP.Client.Conduit (bodyReaderSource)
-import Network.HTTP.Conduit
-       (requestBodySourceChunkedIO, requestBodySourceIO)
+import Network.HTTP.Conduit (requestBodySourceChunkedIO, requestBodySourceIO)
 import Network.HTTP.Types
-       (RequestHeaders, ResponseHeaders, methodGet, methodPost)
+  ( RequestHeaders
+  , ResponseHeaders
+  , methodGet
+  , methodPost
+  )
 import Network.HTTP.Types.Header
-       (hConnection, hContentLength, hContentType, hCookie, hLocation,
-        hTransferEncoding)
+  ( hConnection
+  , hContentLength
+  , hContentType
+  , hCookie
+  , hLocation
+  , hTransferEncoding
+  )
 import Network.HTTP.Types.Status
-       (Status(..), badGateway502, badRequest400, forbidden403, found302,
-        internalServerError500, methodNotAllowed405, movedPermanently301,
-        networkAuthenticationRequired511, notFound404, ok200, seeOther303,
-        temporaryRedirect307)
+  ( Status(..)
+  , badGateway502
+  , badRequest400
+  , forbidden403
+  , found302
+  , internalServerError500
+  , methodNotAllowed405
+  , movedPermanently301
+  , networkAuthenticationRequired511
+  , notFound404
+  , ok200
+  , seeOther303
+  , temporaryRedirect307
+  )
 import Network.Socket (NameInfoFlag(NI_NUMERICHOST), getNameInfo)
 import qualified Network.Wai as W
 import Network.Wai.Conduit (responseSource, sourceRequestBody)
@@ -51,14 +74,20 @@ import Web.Cookie (Cookies, parseCookies, renderCookies)
 import qualified Web.Cookie as WC
 
 import Sproxy.Application.Cookie
-       (AuthCookie(..), AuthUser, cookieDecode, cookieEncode, getEmail,
-        getEmailUtf8, getFamilyNameUtf8, getGivenNameUtf8)
+  ( AuthCookie(..)
+  , AuthUser
+  , cookieDecode
+  , cookieEncode
+  , getEmail
+  , getEmailUtf8
+  , getFamilyNameUtf8
+  , getGivenNameUtf8
+  )
 import Sproxy.Application.OAuth2.Common (OAuth2Client(..))
 import qualified Sproxy.Application.State as State
 import Sproxy.Config (BackendConf(..))
 import qualified Sproxy.Logging as Log
-import Sproxy.Server.DB
-       (Database, userAccess, userExists, userGroups)
+import Sproxy.Server.DB (Database, userAccess, userExists, userGroups)
 
 redirect :: Word16 -> W.Application
 redirect p req resp =
@@ -189,16 +218,16 @@ authenticate key be user url _req resp = do
       authCookie = AuthCookie {acUser = user, acExpiry = expiry}
       cookie =
         WC.def
-        { WC.setCookieName = pack $ beCookieName be
-        , WC.setCookieHttpOnly = True
-        , WC.setCookiePath = Just "/"
-        , WC.setCookieSameSite = Nothing
-        , WC.setCookieSecure = True
-        , WC.setCookieValue = cookieEncode key authCookie
-        , WC.setCookieDomain = domain
-        , WC.setCookieExpires =
-            Just . posixSecondsToUTCTime . realToFrac $ expiry
-        }
+          { WC.setCookieName = pack $ beCookieName be
+          , WC.setCookieHttpOnly = True
+          , WC.setCookiePath = Just "/"
+          , WC.setCookieSameSite = Nothing
+          , WC.setCookieSecure = True
+          , WC.setCookieValue = cookieEncode key authCookie
+          , WC.setCookieDomain = domain
+          , WC.setCookieExpires =
+              Just . posixSecondsToUTCTime . realToFrac $ expiry
+          }
   resp $
     W.responseLBS
       seeOther303
@@ -227,17 +256,17 @@ authorize db (authCookie, otherCookies) req = do
         getNameInfo [NI_NUMERICHOST] True False (W.remoteHost req)
       return . Just $
         req
-        { W.requestHeaders =
-            HM.toList $
-            HM.insert "From" emailUtf8 $
-            HM.insert "X-Groups" (BS.intercalate "," $ encodeUtf8 <$> grps) $
-            HM.insert "X-Given-Name" givenUtf8 $
-            HM.insert "X-Family-Name" familyUtf8 $
-            HM.insert "X-Forwarded-Proto" "https" $
-            HM.insertWith (flip combine) "X-Forwarded-For" ip $
-            setCookies otherCookies $
-            HM.fromListWith combine $ W.requestHeaders req
-        }
+          { W.requestHeaders =
+              HM.toList $
+              HM.insert "From" emailUtf8 $
+              HM.insert "X-Groups" (BS.intercalate "," $ encodeUtf8 <$> grps) $
+              HM.insert "X-Given-Name" givenUtf8 $
+              HM.insert "X-Family-Name" familyUtf8 $
+              HM.insert "X-Forwarded-Proto" "https" $
+              HM.insertWith (flip combine) "X-Forwarded-For" ip $
+              setCookies otherCookies $
+              HM.fromListWith combine $ W.requestHeaders req
+          }
   where
     combine a b = a <> "," <> b
     setCookies [] = HM.delete hCookie
@@ -267,19 +296,19 @@ forward :: BE.Manager -> W.Application
 forward mgr req resp = do
   let beReq =
         BE.defaultRequest
-        { BE.method = W.requestMethod req
-        , BE.path = W.rawPathInfo req
-        , BE.queryString = W.rawQueryString req
-        , BE.requestHeaders = modifyRequestHeaders $ W.requestHeaders req
-        , BE.redirectCount = 0
-        , BE.decompress = const False
-        , BE.requestBody =
-            case W.requestBodyLength req of
-              W.ChunkedBody ->
-                requestBodySourceChunkedIO (sourceRequestBody req)
-              W.KnownLength l ->
-                requestBodySourceIO (fromIntegral l) (sourceRequestBody req)
-        }
+          { BE.method = W.requestMethod req
+          , BE.path = W.rawPathInfo req
+          , BE.queryString = W.rawQueryString req
+          , BE.requestHeaders = modifyRequestHeaders $ W.requestHeaders req
+          , BE.redirectCount = 0
+          , BE.decompress = const False
+          , BE.requestBody =
+              case W.requestBodyLength req of
+                W.ChunkedBody ->
+                  requestBodySourceChunkedIO (sourceRequestBody req)
+                W.KnownLength l ->
+                  requestBodySourceIO (fromIntegral l) (sourceRequestBody req)
+          }
       msg =
         unpack (BE.method beReq <> " " <> BE.path beReq <> BE.queryString beReq)
   Log.debug $ "BACKEND <<< " ++ msg ++ " " ++ show (BE.requestHeaders beReq)
@@ -339,7 +368,7 @@ authenticationRequired key oa2 req resp = do
     authLink provider oa2c html =
       let u = oauth2AuthorizeURL oa2c state (redirectURL req provider)
           d = pack $ oauth2Description oa2c
-      in [qc|{html}<p><a href="{u}">Authenticate with {d}</a></p>|]
+       in [qc|{html}<p><a href="{u}">Authenticate with {d}</a></p>|]
     authHtml = HM.foldrWithKey authLink "" oa2
     page =
       fromStrict
@@ -414,16 +443,16 @@ logout key cookieName cookieDomain req resp = do
     Just _ -> do
       let cookie =
             WC.def
-            { WC.setCookieName = cookieName
-            , WC.setCookieHttpOnly = True
-            , WC.setCookiePath = Just "/"
-            , WC.setCookieSameSite = Just WC.sameSiteStrict
-            , WC.setCookieSecure = True
-            , WC.setCookieValue = "goodbye"
-            , WC.setCookieDomain = cookieDomain
-            , WC.setCookieExpires =
-                Just . posixSecondsToUTCTime . realToFrac $ CTime 0
-            }
+              { WC.setCookieName = cookieName
+              , WC.setCookieHttpOnly = True
+              , WC.setCookiePath = Just "/"
+              , WC.setCookieSameSite = Just WC.sameSiteStrict
+              , WC.setCookieSecure = True
+              , WC.setCookieValue = "goodbye"
+              , WC.setCookieDomain = cookieDomain
+              , WC.setCookieExpires =
+                  Just . posixSecondsToUTCTime . realToFrac $ CTime 0
+              }
       resp $
         W.responseLBS
           found302
