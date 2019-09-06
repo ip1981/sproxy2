@@ -9,17 +9,17 @@ import Data.ByteString.Char8 (pack)
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
-import Data.Word (Word16)
 import Data.Yaml.Include (decodeFileEither)
 import Network.HTTP.Client
        (Manager, ManagerSettings(..), defaultManagerSettings, newManager,
         responseTimeoutMicro, socketConnection)
 import Network.HTTP.Client.Internal (Connection)
 import Network.Socket
-       (Family(AF_INET, AF_UNIX), SockAddr(SockAddrInet, SockAddrUnix),
-        Socket, SocketOption(ReuseAddr), SocketType(Stream), bind, close,
-        connect, inet_addr, listen, maxListenQueue, setSocketOption,
-        socket)
+       (AddrInfoFlag(AI_NUMERICSERV), Family(AF_INET, AF_UNIX),
+       SockAddr(SockAddrInet, SockAddrUnix), Socket, SocketOption(ReuseAddr),
+       SocketType(Stream), addrAddress, addrFamily, addrFlags, addrProtocol,
+       addrSocketType, bind, close, connect, defaultHints, getAddrInfo,
+       listen, maxListenQueue, setSocketOption, socket)
 import Network.Wai (Application)
 import Network.Wai.Handler.Warp
        (Settings, defaultSettings, runSettingsSocket, setHTTP2Disabled,
@@ -142,9 +142,10 @@ newBackendManager be = do
         Log.info $ "backend `" ++ beName be ++ "' on UNIX socket " ++ f
         return $ openUnixSocketConnection f
       (Nothing, Just n) -> do
+        let svc = show n
         Log.info $
-          "backend `" ++ beName be ++ "' on " ++ beAddress be ++ ":" ++ show n
-        return $ openTCPConnection (beAddress be) n
+          "backend `" ++ beName be ++ "' on " ++ beAddress be ++ ":" ++ svc
+        return $ openTCPConnection (beAddress be) svc
       _ -> do
         Log.error "either backend port number or UNIX socket path is required."
         exitFailure
@@ -177,15 +178,17 @@ openUnixSocketConnection f =
        connect s (SockAddrUnix f)
        socketConnection s 8192)
 
-openTCPConnection :: String -> Word16 -> IO Connection
-openTCPConnection addr port =
+openTCPConnection :: String -> String -> IO Connection
+openTCPConnection host svc = do
+  addr:_ <- getAddrInfo (Just hints) (Just host) (Just svc)
   bracketOnError
-    (socket AF_INET Stream 0)
+    (socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr))
     close
     (\s -> do
-       a <- inet_addr addr
-       connect s (SockAddrInet (fromIntegral port) a)
+       connect s (addrAddress addr)
        socketConnection s 8192)
+  where
+    hints = defaultHints {addrFlags = [AI_NUMERICSERV], addrSocketType = Stream}
 
 readConfigFile :: FilePath -> IO ConfigFile
 readConfigFile f = do
